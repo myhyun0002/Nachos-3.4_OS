@@ -72,7 +72,7 @@ Semaphore *full;         // 버퍼가 가득 찼음을 나타내는 세마포어
 void Producer(int id) {
     for (int i = 0; i < NUM_ITEMS; i++) {
         empty->P();    // 버퍼에 빈 공간이 있는지 확인
-        mutex->P();    // 버퍼 접근을 위한 상호 배제
+        mutex->P();    // cs 진입 전 mutual exclusion 실행
 
         // 생산자가 아이템을 생산하여 버퍼에 넣음
         buffer[in] = i;
@@ -80,10 +80,10 @@ void Producer(int id) {
         count++;
 
 		printf("Producer %d produced item %d\n", id, i);
-        mutex->V();    // 상호 배제 해제
+        mutex->V();    // cs 나오면서  mutual exclusion 해제:
         full->V();     // 소비자에게 버퍼에 새로운 아이템이 있다고 알림
 
-        // 생산 속도 조절을 위한 딜레이
+        // ReadyToRun에 들어있는 다른 thread가 실행할 수 있도록 현재 thread는 양보한다.
         currentThread->Yield();
     }
 }
@@ -91,7 +91,7 @@ void Producer(int id) {
 void Consumer(int id) {
     for (int i = 0; i < NUM_ITEMS; i++) {
         full->P();     // 버퍼에 아이템이 있는지 확인
-        mutex->P();    // 버퍼 접근을 위한 상호 배제
+        mutex->P();    // cs 진입 전 mutual exclusion 실행 
 
         // 소비자가 버퍼에서 아이템을 가져옴
         int item = buffer[out];
@@ -99,10 +99,11 @@ void Consumer(int id) {
         count--;
 
 		printf("Consumer %d consumed item %d\n", id, item);
-		mutex->V();    // 상호 배제 해제
+		mutex->V();    // cs 나오면서  mutual exclusion 해제:
         empty->V();    // 생산자에게 버퍼에 빈 공간이 있다고 알림
 
-        // 소비 속도 조절을 위한 딜레이
+        // ReadyToRun에 들어있는 다른 thread가 실행할 수 있도록 현재 thread는 양
+보한다.
         currentThread->Yield();
     }
 }
