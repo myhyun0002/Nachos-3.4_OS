@@ -14,6 +14,7 @@
 #include "synch.h"
 #include "thread.h"
 #include "syscall.h"
+#include "scheduler.h"
 
 // testnum is set in main.cc
 int testnum = 1;
@@ -83,7 +84,7 @@ void Producer(int id) {
         mutex->V();    // cs 나오면서  mutual exclusion 해제:
         full->V();     // 소비자에게 버퍼에 새로운 아이템이 있다고 알림
 
-        // ReadyToRun에 들어있는 다른 thread가 실행할 수 있도록 현재 thread는 양보한다.
+		// ReadyToRun에 들어있는 다른 thread가 실행할 수 있도록 현재 thread는 양//보한다.
         currentThread->Yield();
     }
 }
@@ -103,7 +104,7 @@ void Consumer(int id) {
         empty->V();    // 생산자에게 버퍼에 빈 공간이 있다고 알림
 
         // ReadyToRun에 들어있는 다른 thread가 실행할 수 있도록 현재 thread는 양
-보한다.
+//보한다.
         currentThread->Yield();
     }
 }
@@ -128,6 +129,8 @@ void printPriority(int priority){
 }
 
 void PrioritySchedularTest(){
+	Scheduler *scheduler = new Scheduler();
+
 	Thread *thread1 = new Thread("thread1");
 	Thread *thread2 = new Thread("thread2");
 	Thread *thread3 = new Thread("thread3");
@@ -143,7 +146,14 @@ void PrioritySchedularTest(){
 	thread3->Fork(printPriority,thread3->getPriority());
 	thread4->Fork(printPriority,thread4->getPriority());
 
+	scheduler->ReadyToRun(thread1);
+    scheduler->ReadyToRun(thread2);
+    scheduler->ReadyToRun(thread3);
+    scheduler->ReadyToRun(thread4);
+
 	currentThread->Finish();
+	
+    scheduler->Print();
 }
 
 
