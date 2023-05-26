@@ -131,29 +131,72 @@ void printPriority(int priority){
 void PrioritySchedularTest(){
 	Scheduler *scheduler = new Scheduler();
 
-	Thread *thread1 = new Thread("thread1");
-	Thread *thread2 = new Thread("thread2");
-	Thread *thread3 = new Thread("thread3");
-	Thread *thread4 = new Thread("thread4");
+	Thread *thread1_10 = new Thread("thread1_priority_10");
+	Thread *thread2_2 = new Thread("thread2_priority_2");
+	Thread *thread3_5 = new Thread("thread3_priority_5");
+	Thread *thread4_3 = new Thread("thread4_priority_3");
+	Thread *thread5_1 = new Thread("thread5_priority_1");
 
-	thread1->setPriority(10);
-	thread2->setPriority(2);
-	thread3->setPriority(5);
-	thread4->setPriority(3);
+	thread1_10->setPriority(10);
+	thread2_2->setPriority(2);
+	thread3_5->setPriority(5);
+	thread4_3->setPriority(3);
+	thread5_1->setPriority(1);
 
-	thread1->Fork(printPriority,thread1->getPriority());
-	thread2->Fork(printPriority,thread2->getPriority());
-	thread3->Fork(printPriority,thread3->getPriority());
-	thread4->Fork(printPriority,thread4->getPriority());
+	thread1_10->Fork(printPriority,thread1_10->getPriority());
+	thread2_2->Fork(printPriority,thread2_2->getPriority());
+	thread3_5->Fork(printPriority,thread3_5->getPriority());
+	thread4_3->Fork(printPriority,thread4_3->getPriority());
 
-	scheduler->ReadyToRun(thread1);
-    scheduler->ReadyToRun(thread2);
-    scheduler->ReadyToRun(thread3);
-    scheduler->ReadyToRun(thread4);
-
-	currentThread->Finish();
+	scheduler->ReadyToRun(thread1_10);
+    scheduler->ReadyToRun(thread2_2);
+    scheduler->ReadyToRun(thread3_5);
+    scheduler->ReadyToRun(thread4_3);
 	
+	IntStatus oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
     scheduler->Print();
+	printf("\n");
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+	
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+	scheduler->Run(currentThread);
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+    currentThread->Yield();
+	printf("2번 thread가 cpu 실행 중지하고 readyList들어간 후 다음 thread 실행\n");
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+	
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+	printf("우선 순위가 1인 thread가 fork되었다.\n");
+    thread5_1->Fork(printPriority,thread5_1->getPriority());
+	scheduler->ReadyToRun(thread5_1);
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+	
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+	printf("우선 순위 1인 thread가 들어온 후 readylist 상황\n");
+	scheduler->Print();
+	interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+	currentThread->Yield();
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+    
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+    scheduler->Print();
+    printf("\n");
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+    currentThread->Finish();
+	
 }
 
 
