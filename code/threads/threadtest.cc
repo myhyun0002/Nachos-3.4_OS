@@ -157,26 +157,38 @@ void PrioritySchedularTest(){
     scheduler->Print();
 	printf("\n");
     interrupt->SetLevel(oldLevel); // Restore interrupt status
-	
-	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
-	scheduler->Run(currentThread);
-    interrupt->SetLevel(oldLevel); // Restore interrupt status
 
 	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
     currentThread->Yield();
 	printf("2번 thread가 cpu 실행 중지하고 readyList들어간 후 다음 thread 실행\n");
     interrupt->SetLevel(oldLevel); // Restore interrupt status
-	
 
 	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
-	printf("우선 순위가 1인 thread가 fork되었다.\n");
-    thread5_1->Fork(printPriority,thread5_1->getPriority());
-	scheduler->ReadyToRun(thread5_1);
+    currentThread->Yield();
+    printf("3번 thread가 cpu 실행 중지하고 readyList들어간 후 다음 thread 실행\n");
     interrupt->SetLevel(oldLevel); // Restore interrupt status
+	
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+    printf("우선 순위가 1인 thread가 fork되었다.\n");
+    thread5_1->Fork(printPriority,thread5_1->getPriority());
+    scheduler->ReadyToRun(thread5_1);
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+
+	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+    currentThread->Yield();
+    printf("1번 thread가 cpu 실행 중지하고 readyList들어간 후 다음 thread 실행\n");
+    interrupt->SetLevel(oldLevel); // Restore interrupt status
+	
+	//oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
+	//printf("우선 순위가 1인 thread가 fork되었다.\n");
+    //thread5_1->Fork(printPriority,thread5_1->getPriority());
+	//scheduler->ReadyToRun(thread5_1);
+    //interrupt->SetLevel(oldLevel); // Restore interrupt status
 	
 	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
 	printf("우선 순위 1인 thread가 들어온 후 readylist 상황\n");
 	scheduler->Print();
+	printf("\n");
 	interrupt->SetLevel(oldLevel); // Restore interrupt status
 
 	oldLevel = interrupt->SetLevel(IntOff); // Disable interrupts
